@@ -24,6 +24,9 @@ services:
 
   discountdb:
     image: postgres
+  
+  pgadmin:
+    image: dpage/pgadmin4
 
   discount.api:
     image: ${DOCKER_REGISTRY-}discountapi
@@ -36,3 +39,4 @@ volumes:
   basketdb_data:
   portainer_data:
   discountdb_data:
+  pgadmin_data:

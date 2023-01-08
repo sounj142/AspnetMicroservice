@@ -23,7 +23,7 @@ public class ProductsController : ControllerBase
         return Ok(await _productRepository.GetProducts());
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id}", Name = "GetProductById")]
     [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<IActionResult> GetProductById(string id)
@@ -46,7 +46,7 @@ public class ProductsController : ControllerBase
     {
         var createdProduct = await _productRepository.CreateProduct(product);
 
-        return CreatedAtRoute(nameof(GetProductById), new { id = product.Id }, createdProduct);
+        return CreatedAtRoute("GetProductById", new { id = product.Id }, createdProduct);
     }
 
     [HttpPut]

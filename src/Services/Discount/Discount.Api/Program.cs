@@ -1,13 +1,14 @@
+using Discount.Api;
+using Discount.Api.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+ConfigureServices.Config(builder);
 
 var app = builder.Build();
+
+DatabaseMigration.Migration(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
