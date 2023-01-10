@@ -17,6 +17,6 @@ public class ShoppingCart
 
     public decimal TotalPrice
     {
-        get => Items.Sum(x => x.Price * x.Quantity);
+        get => Items.Sum(x => Math.Max(0, x.Price - x.DiscountAmount) * x.Quantity);
     }
 }

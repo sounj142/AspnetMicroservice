@@ -10,4 +10,5 @@ public class ShopingCartItem
     public string Category { get; set; } = string.Empty;
     public string? ImageFile { get; set; }
     public decimal Price { get; set; }
+    public int DiscountAmount { get; set; }
 }

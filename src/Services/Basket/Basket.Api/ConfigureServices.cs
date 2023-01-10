@@ -1,4 +1,6 @@
 ﻿using Basket.Api.Repositories;
+using Basket.Api.Services;
+using static Discount.Grpc.DiscountService;
 
 namespace Basket.Api;
 
@@ -13,6 +15,13 @@ public static class ConfigureServices
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+
+        services
+            .AddGrpcClient<DiscountServiceClient>(o =>
+            {
+                o.Address = new Uri(configuration["DiscountServiceHost"]);
+            });
+        services.AddScoped<DiscountGrpcService>();
 
         services.AddStackExchangeRedisCache(options =>
         {
