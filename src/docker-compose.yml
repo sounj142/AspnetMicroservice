@@ -28,11 +28,11 @@ services:
   pgadmin:
     image: dpage/pgadmin4
 
-  discount.api:
-    image: ${DOCKER_REGISTRY-}discountapi
+  discount.grpc:
+    image: ${DOCKER_REGISTRY-}discountgrpc
     build:
       context: .
-      dockerfile: Services/Discount/Discount.Api/Dockerfile
+      dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
 volumes:
   catalogdb_data:

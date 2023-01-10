@@ -1,7 +1,7 @@
 ﻿using Npgsql;
 using Dapper;
 
-namespace Discount.Api.Repositories;
+namespace Discount.Grpc.Repositories;
 
 public class DatabaseMigration
 {
