@@ -34,9 +34,20 @@ services:
       context: .
       dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
+  orderdb:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+
+  ordering.api:
+    image: ${DOCKER_REGISTRY-}orderingapi
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.Api/Dockerfile
+
 volumes:
   catalogdb_data:
   basketdb_data:
   portainer_data:
   discountdb_data:
   pgadmin_data:
+  orderdb_data:
+

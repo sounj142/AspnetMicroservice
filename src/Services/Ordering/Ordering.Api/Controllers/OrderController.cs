@@ -33,7 +33,7 @@ namespace Ordering.Api.Controllers
         public async Task<IActionResult> CreateOrder(CheckoutOrderCommand command)
         {
             int orderId = await _mediator.Send(command);
-            return Ok(orderId);
+            return StatusCode(StatusCodes.Status201Created, orderId);
         }
 
         [HttpPut]

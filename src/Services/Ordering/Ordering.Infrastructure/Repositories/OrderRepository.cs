@@ -12,7 +12,24 @@ namespace Ordering.Infrastructure.Repositories
 
         public Task<Order[]> GetOrdersByUserName(string userName)
         {
-            return _orderDbSet.Where(x => x.UserName == userName).ToArrayAsync();
+            return _orderDbSet
+                .Include(x => x.OrderItems)
+                .Where(x => x.UserName == userName)
+                .ToArrayAsync();
+        }
+
+        public override Task<Order[]> GetAll()
+        {
+            return _orderDbSet
+                .Include(x => x.OrderItems)
+                .ToArrayAsync();
+        }
+
+        public override Task<Order?> GetById(int id)
+        {
+            return _orderDbSet
+                .Include(x => x.OrderItems)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }

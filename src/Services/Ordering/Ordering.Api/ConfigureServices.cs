@@ -1,4 +1,5 @@
-﻿using Ordering.Api.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using Ordering.Api.Services;
 using Ordering.Application;
 using Ordering.Application.Contracts;
 using Ordering.Application.Models;
@@ -17,6 +18,12 @@ public static class ConfigureServices
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+
+        services.Configure<ApiBehaviorOptions>(options =>
+        {
+            // disable default Validation failure response mechanism
+            options.SuppressModelStateInvalidFilter = true;
+        });
 
         services.AddApplicationServices();
         services.AddInfrastructureServices(
