@@ -1,7 +1,6 @@
 ﻿using Catalog.Api.Entities;
 using Catalog.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Catalog.Api.Controllers;
 
@@ -17,15 +16,15 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(IList<Product>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IList<Product>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProducts()
     {
         return Ok(await _productRepository.GetProducts());
     }
 
     [HttpGet("{id}", Name = "GetProductById")]
-    [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProductById(string id)
     {
         var product = await _productRepository.GetProduct(id);
@@ -33,7 +32,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("ByCategory/{categoryName}")]
-    [ProducesResponseType(typeof(IList<Product>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IList<Product>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProductByCategory(string categoryName)
     {
         var products = await _productRepository.GetProductsByCategoryName(categoryName);
@@ -41,7 +40,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(Product), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateProduct(Product product)
     {
         var createdProduct = await _productRepository.CreateProduct(product);
@@ -50,7 +49,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut]
-    [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateProduct(Product product)
     {
         var result = await _productRepository.UpdateProduct(product);
@@ -59,7 +58,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteProduct(string id)
     {
         var result = await _productRepository.DeleteProduct(id);
