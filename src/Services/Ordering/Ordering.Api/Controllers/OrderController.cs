@@ -27,14 +27,14 @@ namespace Ordering.Api.Controllers
             return Ok(orders);
         }
 
-        [HttpPost]
-        [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateOrder(CheckoutOrderCommand command)
-        {
-            int orderId = await _mediator.Send(command);
-            return StatusCode(StatusCodes.Status201Created, orderId);
-        }
+        //[HttpPost]
+        //[ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+        //[ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
+        //public async Task<IActionResult> CreateOrder(CheckoutOrderCommand command)
+        //{
+        //    int orderId = await _mediator.Send(command);
+        //    return StatusCode(StatusCodes.Status201Created, orderId);
+        //}
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

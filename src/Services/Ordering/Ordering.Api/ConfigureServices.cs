@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EventBus.Messages.Common;
+using MassTransit;
+using Microsoft.AspNetCore.Mvc;
+using Ordering.Api.EventBusConsumers;
 using Ordering.Api.Services;
 using Ordering.Application;
 using Ordering.Application.Contracts;
@@ -14,8 +17,8 @@ public static class ConfigureServices
         var services = builder.Services;
         var configuration = builder.Configuration;
 
+        // Web api configuration
         services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 
@@ -25,10 +28,32 @@ public static class ConfigureServices
             options.SuppressModelStateInvalidFilter = true;
         });
 
+        // RabbitMq configuration
+        services.AddMassTransit(config =>
+        {
+            config.AddConsumer<BasketCheckoutConsumer>();
+
+            config.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(configuration["EventBus:Host"]);
+                cfg.ReceiveEndpoint(EventBusConstants.BasketCheckoutQueue, c =>
+                {
+                    c.ConfigureConsumer<BasketCheckoutConsumer>(context);
+                });
+            });
+        });
+        services.AddMassTransitHostedService();
+        services.AddScoped<BasketCheckoutConsumer>();
+
+        // AutoMapper configuration
+        services.AddAutoMapper(typeof(ConfigureServices));
+
+        // libraries configuration
         services.AddApplicationServices();
         services.AddInfrastructureServices(
             configuration.GetConnectionString("DefaultConnection"));
 
+        // General configuration
         services.AddSingleton(
             configuration.GetSection("EmailSettings").Get<EmailSettings>());
 

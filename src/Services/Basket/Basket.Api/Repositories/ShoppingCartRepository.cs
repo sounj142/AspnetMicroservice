@@ -13,11 +13,11 @@ public class ShoppingCartRepository : IShoppingCartRepository
         _redisCache = redisCache;
     }
 
-    public async Task<ShoppingCart> GetShoppingCart(string userName)
+    public async Task<ShoppingCart?> GetShoppingCart(string userName)
     {
         var jsonContent = await _redisCache.GetStringAsync(userName.ToLowerInvariant());
         return string.IsNullOrEmpty(jsonContent)
-            ? new ShoppingCart(userName)
+            ? null
             : JsonSerializer.Deserialize<ShoppingCart>(jsonContent)!;
     }
 

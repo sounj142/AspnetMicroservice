@@ -1,6 +1,11 @@
-﻿using Basket.Api.Entities;
+﻿using AutoMapper;
+using Basket.Api.Entities;
+using Basket.Api.Models;
 using Basket.Api.Repositories;
 using Basket.Api.Services;
+using EventBus.Messages.Events;
+using MassTransit;
+using MassTransit.Transports;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Basket.Api.Controllers;
@@ -11,25 +16,32 @@ public class ShoppingCartController : ControllerBase
 {
     private readonly IShoppingCartRepository _shoppingCartRepository;
     private readonly DiscountGrpcService _discountService;
+    private readonly IMapper _mapper;
+    private readonly IPublishEndpoint _publishEndpoint;
 
     public ShoppingCartController(
         IShoppingCartRepository shoppingCartRepository,
-        DiscountGrpcService discountService
+        DiscountGrpcService discountService,
+        IMapper mapper,
+        IPublishEndpoint publishEndpoint
         )
     {
         _shoppingCartRepository = shoppingCartRepository;
         _discountService = discountService;
+        _mapper = mapper;
+        _publishEndpoint = publishEndpoint;
     }
 
     [HttpGet("{userName}")]
     [ProducesResponseType(typeof(ShoppingCart), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetShoppingCart(string userName)
     {
-        return Ok(await _shoppingCartRepository.GetShoppingCart(userName));
+        return Ok(await _shoppingCartRepository.GetShoppingCart(userName)
+            ?? new ShoppingCart(userName));
     }
 
     [HttpPut]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ShoppingCart), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateShoppingCart(ShoppingCart shoppingCart)
     {
         foreach (var item in shoppingCart.Items)
@@ -38,7 +50,7 @@ public class ShoppingCartController : ControllerBase
             item.DiscountAmount = coupon?.Amount ?? 0;
         }
         await _shoppingCartRepository.UpdateShoppingCart(shoppingCart);
-        return Ok();
+        return Ok(shoppingCart);
     }
 
     [HttpDelete("{userName}")]
@@ -47,5 +59,22 @@ public class ShoppingCartController : ControllerBase
     {
         await _shoppingCartRepository.DeleteShoppingCart(userName);
         return Ok();
+    }
+
+    [HttpPost("Checkout")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Checkout(BasketCheckout basketCheckout)
+    {
+        var shoppingCart = await _shoppingCartRepository.GetShoppingCart(basketCheckout.UserName);
+        if (shoppingCart == null)
+            return BadRequest();
+
+        var checkoutEvent = _mapper.Map<BasketCheckoutEvent>(shoppingCart);
+        _mapper.Map(basketCheckout, checkoutEvent);
+        await _publishEndpoint.Publish(checkoutEvent);
+
+        await _shoppingCartRepository.DeleteShoppingCart(basketCheckout.UserName);
+        return Accepted();
     }
 }
