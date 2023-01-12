@@ -58,6 +58,7 @@ public static class ConfigureServices
             configuration.GetSection("EmailSettings").Get<EmailSettings>());
 
         services.AddHttpContextAccessor();
+        services.AddScoped<ManualCurrentUserContext>();
         services.AddScoped<ICurrentUserContext, CurrentUserContext>();
     }
 }

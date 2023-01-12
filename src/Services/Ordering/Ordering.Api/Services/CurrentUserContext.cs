@@ -6,12 +6,16 @@ namespace Ordering.Api.Services;
 public class CurrentUserContext : ICurrentUserContext
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ManualCurrentUserContext _manualCurrentUserContext;
 
-    public CurrentUserContext(IHttpContextAccessor httpContextAccessor)
+    public CurrentUserContext(IHttpContextAccessor httpContextAccessor,
+        ManualCurrentUserContext manualCurrentUserContext)
     {
         _httpContextAccessor = httpContextAccessor;
+        _manualCurrentUserContext = manualCurrentUserContext;
     }
 
     public string? GetCurrentUserName()
-        => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);
+        => _manualCurrentUserContext.GetCurrentUserName()
+        ?? _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);
 }

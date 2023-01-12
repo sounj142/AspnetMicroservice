@@ -48,7 +48,7 @@ public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,
             await _emailService.SendEmail(new Email
             {
                 To = order.EmailAddress,
-                Body = $"Your order was created. Order id {order.Id}",
+                Body = $"<h3>Your order was created. Order id {order.Id}.</h3>",
                 Subject = "Your order was created."
             });
         }
