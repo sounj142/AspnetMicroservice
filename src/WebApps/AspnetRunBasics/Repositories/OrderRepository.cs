@@ -1,36 +1,36 @@
-﻿using AspnetRunBasics.Data;
-using AspnetRunBasics.Entities;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using AspnetRunBasics.Entities;
+using AspnetRunBasics.Helpers;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AspnetRunBasics.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
-        protected readonly AspnetRunContext _dbContext;
+        private readonly HttpClient _client;
 
-        public OrderRepository(AspnetRunContext dbContext)
+        public OrderRepository(IHttpClientFactory httpClientFactory)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _client = httpClientFactory.CreateClient();
         }
 
-        public async Task<Order> CheckOut(Order order)
+        public async Task CheckOut(Order order)
         {
-            _dbContext.Orders.Add(order);
-            await _dbContext.SaveChangesAsync();
-            return order;
+            var jsonData = new StringContent(
+                JsonSerializer.Serialize(order),
+                Encoding.UTF8,
+                Application.Json);
+
+            await _client.PostAsync("/Basket/Checkout", jsonData);
         }
 
-        public async Task<IEnumerable<Order>> GetOrdersByUserName(string userName)
+        public async Task<Order[]> GetOrdersByUserName(string userName)
         {
-            var orderList = await _dbContext.Orders
-                            .Where(o => o.UserName == userName)
-                            .ToListAsync();
-
-            return orderList;
+            var response = await _client.GetAsync($"/Order?userName={userName}");
+            return await response.ReadContentAs<Order[]>();
         }
     }
 }

@@ -1,85 +1,83 @@
-﻿using AspnetRunBasics.Data;
-using AspnetRunBasics.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using AspnetRunBasics.Entities;
+using AspnetRunBasics.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AspnetRunBasics.Repositories
 {
     public class CartRepository : ICartRepository
     {
-        protected readonly AspnetRunContext _dbContext;
+        private readonly HttpClient _client;
+        private readonly IServiceProvider _serviceProvider;
 
-        public CartRepository(AspnetRunContext dbContext)
+        public CartRepository(IHttpClientFactory httpClientFactory, IServiceProvider serviceProvider)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _client = httpClientFactory.CreateClient();
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<Cart> GetCartByUserName(string userName)
         {
-            var cart =  _dbContext.Carts
-                        .Include(c => c.Items)
-                            .ThenInclude(i => i.Product)
-                        .FirstOrDefault(c => c.UserName == userName);
-
-            if (cart != null)
-                return cart;
-
-            // if it is first attempt create new
-            var newCart = new Cart
-            {
-                UserName = userName
-            };
-
-            _dbContext.Carts.Add(newCart);
-            await _dbContext.SaveChangesAsync();
-            return newCart;
+            var response = await _client.GetAsync($"/Basket/{userName}");
+            return await response.ReadContentAs<Cart>();
         }
 
-        public async Task AddItem(string userName, int productId, int quantity = 1, string color = "Black")
+        public async Task AddItem(string userName, string productId, int quantity = 1, string color = "Black")
         {
             var cart = await GetCartByUserName(userName);
-            
-            cart.Items.Add(
-                    new CartItem
-                    {
-                        ProductId = productId,
-                        Color = color,
-                        Price = _dbContext.Products.FirstOrDefault(p => p.Id == productId).Price,
-                        Quantity = quantity
-                    }
-                );
 
-            _dbContext.Entry(cart).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
+            var productRepo = _serviceProvider.GetRequiredService<IProductRepository>();
+            var product = await productRepo.GetProductById(productId);
+            if (product == null)
+                throw new ApplicationException("Product not found.");
+
+            var cartItem = cart.Items.FirstOrDefault(x => x.ProductId == product.Id);
+            if (cartItem == null)
+            {
+                cartItem = new CartItem();
+                cart.Items.Add(cartItem);
+            }
+            cartItem.Category = product.Category;
+            cartItem.Color = color;
+            cartItem.ImageFile = product.ImageFile;
+            cartItem.Name = product.Name;
+            cartItem.Price = product.Price;
+            cartItem.ProductId = product.Id;
+            cartItem.Summary = product.Summary;
+
+            cartItem.Quantity += quantity;
+
+            var jsonData = new StringContent(
+                JsonSerializer.Serialize(cart),
+                Encoding.UTF8,
+                Application.Json);
+            var response = await _client.PutAsync("/Basket", jsonData);
+            var c = await response.ReadContentAs<Cart>();
         }
 
-        public async Task RemoveItem(int cartId, int cartItemId)
+        public async Task RemoveItem(string userName, string productId)
         {
-            var cart = _dbContext.Carts
-                       .Include(c => c.Items)
-                       .FirstOrDefault(c => c.Id == cartId);
+            var cart = await GetCartByUserName(userName);
 
-            if (cart != null)
-            {
-                var removedItem = cart.Items.FirstOrDefault(x => x.Id == cartItemId);
-                cart.Items.Remove(removedItem);
+            cart.Items = cart.Items.Where(x => x.ProductId != productId)
+                .ToList();
 
-                _dbContext.Entry(cart).State = EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
-            }                
-
+            var jsonData = new StringContent(
+                JsonSerializer.Serialize(cart),
+                Encoding.UTF8,
+                Application.Json);
+            await _client.PutAsync("/Basket", jsonData);
         }
 
         public async Task ClearCart(string userName)
         {
-            var cart = await GetCartByUserName(userName);
-
-            cart.Items.Clear();
-
-            _dbContext.Entry(cart).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
+            await _client.DeleteAsync($"/Basket/{userName}");
         }
     }
 }

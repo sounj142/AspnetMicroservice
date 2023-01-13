@@ -1,72 +1,71 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using AspnetRunBasics.Data;
 using AspnetRunBasics.Entities;
-using Microsoft.EntityFrameworkCore;
+using AspnetRunBasics.Helpers;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AspnetRunBasics.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        protected readonly AspnetRunContext _dbContext;
+        private readonly HttpClient _client;
 
-        public ProductRepository(AspnetRunContext dbContext)
+        public ProductRepository(IHttpClientFactory httpClientFactory)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _client = httpClientFactory.CreateClient();
         }
 
-        public async Task<IEnumerable<Product>> GetProducts()
+        public async Task<Product[]> GetProducts()
         {
-            return await _dbContext.Products.ToListAsync();
+            var response = await _client.GetAsync("/Catalog");
+            return await response.ReadContentAs<Product[]>();
         }
 
-        public async Task<Product> GetProductById(int id)
+        public async Task<Product> GetProductById(string id)
         {
-            return await _dbContext.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var response = await _client.GetAsync($"/Catalog/{id}");
+            return await response.ReadContentAs<Product>();
         }
 
-        public async Task<IEnumerable<Product>> GetProductByName(string name)
+        public async Task<Product[]> GetProductByCategory(string categoryName)
         {
-            return await _dbContext.Products
-                    .Include(p => p.Category)
-                    .Where(p => string.IsNullOrEmpty(name) || p.Name.ToLower().Contains(name.ToLower()))
-                    .OrderBy(p => p.Name)
-                    .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Product>> GetProductByCategory(int categoryId)
-        {
-            return await _dbContext.Products
-                .Where(x => x.CategoryId == categoryId)
-                .ToListAsync();
+            var response = await _client.GetAsync($"/Catalog/GetProductByCategory/{categoryName}");
+            return await response.ReadContentAs<Product[]>();
         }
 
         public async Task<Product> AddAsync(Product product)
         {
-            _dbContext.Products.Add(product);
-            await _dbContext.SaveChangesAsync();
-            return product;
+            var jsonData = new StringContent(
+                JsonSerializer.Serialize(product),
+                Encoding.UTF8,
+                Application.Json);
+            var response = await _client.PostAsync("/Catalog", jsonData);
+            var result = await response.ReadContentAs<Product>();
+            return result;
         }
 
         public async Task UpdateAsync(Product product)
         {
-            _dbContext.Entry(product).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
+            var jsonData = new StringContent(
+                JsonSerializer.Serialize(product),
+                Encoding.UTF8,
+                Application.Json);
+            await _client.PutAsync("/Catalog", jsonData);
         }
 
-        public async Task DeleteAsync(Product product)
+        public async Task DeleteAsync(string id)
         {
-            _dbContext.Products.Remove(product);
-            await _dbContext.SaveChangesAsync();
+            await _client.DeleteAsync($"/Catalog/{id}");
         }
 
-        public async Task<IEnumerable<Category>> GetCategories()
+        public async Task<Category[]> GetCategories()
         {
-            return await _dbContext.Categories.ToListAsync();
+            var products = await GetProducts();
+            return products.Select(p => p.Category).Distinct()
+                .Select(name => new Category { Name = name }).ToArray();
         }
     }
 }

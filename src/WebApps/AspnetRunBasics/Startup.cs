@@ -1,11 +1,10 @@
-using AspnetRunBasics.Data;
 using AspnetRunBasics.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace AspnetRunBasics
 {
@@ -21,23 +20,17 @@ namespace AspnetRunBasics
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            #region database services
-
-            // add database dependecy
-            services.AddDbContext<AspnetRunContext>(c =>
-                c.UseSqlServer(Configuration.GetConnectionString("AspnetRunConnection")));
-
-            #endregion database services
-
-
-
             #region project services
+
+            services.AddHttpClient("", client =>
+            {
+                client.BaseAddress = new Uri(Configuration["Apis:OcelotApiGateway"]);
+            });
 
             // add repository dependecy
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
-            services.AddScoped<IContactRepository, ContactRepository>();
 
             #endregion project services
 

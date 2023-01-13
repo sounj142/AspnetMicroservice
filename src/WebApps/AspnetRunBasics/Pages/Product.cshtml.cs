@@ -22,18 +22,17 @@ namespace AspnetRunBasics
         public IEnumerable<Entities.Category> CategoryList { get; set; } = new List<Entities.Category>();
         public IEnumerable<Entities.Product> ProductList { get; set; } = new List<Entities.Product>();
 
-
         [BindProperty(SupportsGet = true)]
         public string SelectedCategory { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? categoryId)
+        public async Task<IActionResult> OnGetAsync(string categoryName)
         {
             CategoryList = await _productRepository.GetCategories();
 
-            if (categoryId.HasValue)
+            if (!string.IsNullOrEmpty(categoryName))
             {
-                ProductList = await _productRepository.GetProductByCategory(categoryId.Value);
-                SelectedCategory = CategoryList.FirstOrDefault(c => c.Id == categoryId.Value)?.Name;
+                ProductList = await _productRepository.GetProductByCategory(categoryName);
+                SelectedCategory = CategoryList.FirstOrDefault(c => c.Name == categoryName)?.Name;
             }
             else
             {
@@ -43,7 +42,7 @@ namespace AspnetRunBasics
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAddToCartAsync(int productId)
+        public async Task<IActionResult> OnPostAddToCartAsync(string productId)
         {
             //if (!User.Identity.IsAuthenticated)
             //    return RedirectToPage("./Account/Login", new { area = "Identity" });
