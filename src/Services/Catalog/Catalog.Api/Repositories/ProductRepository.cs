@@ -24,6 +24,13 @@ public class ProductRepository : IProductRepository
             .ToListAsync();
     }
 
+    public async Task<IList<Product>> GetProducts(string[] ids)
+    {
+        var filter = Builders<Product>.Filter.In(p => p.Id, ids);
+        return await _dbContext.Products.Find(filter)
+            .ToListAsync();
+    }
+
     public async Task<IList<Product>> SearchProductsByName(string name)
     {
         //!!!!!!!!!!!!

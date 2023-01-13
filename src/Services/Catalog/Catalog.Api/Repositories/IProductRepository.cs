@@ -6,6 +6,8 @@ public interface IProductRepository
 {
     Task<IList<Product>> GetProducts();
 
+    Task<IList<Product>> GetProducts(string[] ids);
+
     Task<Product?> GetProduct(string id);
 
     Task<IList<Product>> SearchProductsByName(string name);

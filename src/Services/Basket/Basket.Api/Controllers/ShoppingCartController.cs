@@ -5,7 +5,6 @@ using Basket.Api.Repositories;
 using Basket.Api.Services;
 using EventBus.Messages.Events;
 using MassTransit;
-using MassTransit.Transports;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Basket.Api.Controllers;

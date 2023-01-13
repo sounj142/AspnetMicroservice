@@ -1,7 +1,6 @@
 ﻿using Basket.Api.Repositories;
 using Basket.Api.Services;
 using MassTransit;
-using System.Reflection;
 using static Discount.Grpc.DiscountService;
 
 namespace Basket.Api;

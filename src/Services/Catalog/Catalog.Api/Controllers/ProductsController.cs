@@ -22,6 +22,13 @@ public class ProductsController : ControllerBase
         return Ok(await _productRepository.GetProducts());
     }
 
+    [HttpGet("GetByIds")]
+    [ProducesResponseType(typeof(IList<Product>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetProductsByIds([FromQuery] string ids)
+    {
+        return Ok(await _productRepository.GetProducts(ids.Split(',')));
+    }
+
     [HttpGet("{id}", Name = "GetProductById")]
     [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

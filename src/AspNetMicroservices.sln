@@ -35,7 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus.Messages", "Buildi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateways", "ApiGateways", "{AFC94B58-5F92-4417-84AD-B393B81EF43D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcelotApiGateway", "ApiGateways\OcelotApiGateway\OcelotApiGateway.csproj", "{D782C272-8EC8-4ED2-B4FB-01E1B8AE4515}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OcelotApiGateway", "ApiGateways\OcelotApiGateway\OcelotApiGateway.csproj", "{D782C272-8EC8-4ED2-B4FB-01E1B8AE4515}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shopping.AggregatorApi", "ApiGateways\Shopping.AggregatorApi\Shopping.AggregatorApi.csproj", "{E7FAAB9C-AFC3-4AAF-8169-7C1EEF480D24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,10 @@ Global
 		{D782C272-8EC8-4ED2-B4FB-01E1B8AE4515}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D782C272-8EC8-4ED2-B4FB-01E1B8AE4515}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D782C272-8EC8-4ED2-B4FB-01E1B8AE4515}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7FAAB9C-AFC3-4AAF-8169-7C1EEF480D24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7FAAB9C-AFC3-4AAF-8169-7C1EEF480D24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7FAAB9C-AFC3-4AAF-8169-7C1EEF480D24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7FAAB9C-AFC3-4AAF-8169-7C1EEF480D24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,6 +107,7 @@ Global
 		{4DB341BE-1E3C-4177-B8AD-109612E64501} = {AB95A355-5E84-4F61-B4BB-BE51883BD201}
 		{77E10AEE-6CFA-432E-B52A-06EDEFBEFACD} = {4AF6B29E-A7CA-4C26-B300-FC976404A0EA}
 		{D782C272-8EC8-4ED2-B4FB-01E1B8AE4515} = {AFC94B58-5F92-4417-84AD-B393B81EF43D}
+		{E7FAAB9C-AFC3-4AAF-8169-7C1EEF480D24} = {AFC94B58-5F92-4417-84AD-B393B81EF43D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6389A677-71FB-4954-B02A-0872E3C0CE2A}

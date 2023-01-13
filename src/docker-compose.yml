@@ -52,6 +52,12 @@ services:
       context: .
       dockerfile: ApiGateways/OcelotApiGateway/Dockerfile
 
+  shopping.aggregatorapi:
+    image: ${DOCKER_REGISTRY-}shoppingaggregatorapi
+    build:
+      context: .
+      dockerfile: ApiGateways/Shopping.AggregatorApi/Dockerfile
+
 volumes:
   catalogdb_data:
   basketdb_data:
@@ -60,3 +66,4 @@ volumes:
   pgadmin_data:
   orderdb_data:
   rabbitmq_data:
+
