@@ -58,6 +58,12 @@ services:
       context: .
       dockerfile: ApiGateways/Shopping.AggregatorApi/Dockerfile
 
+  aspnetrunbasics:
+    image: ${DOCKER_REGISTRY-}aspnetrunbasics
+    build:
+      context: .
+      dockerfile: WebApps/AspnetRunBasics/Dockerfile
+
 volumes:
   catalogdb_data:
   basketdb_data:
@@ -66,4 +72,3 @@ volumes:
   pgadmin_data:
   orderdb_data:
   rabbitmq_data:
-

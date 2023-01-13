@@ -140,3 +140,13 @@ services:
       - ordering.api
     ports:
       - "8005:80"
+
+  aspnetrunbasics:
+    container_name: aspnetrunbasics
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Apis__OcelotApiGateway=http://ocelotapigateway
+    ports:
+      - "8020:80"
+    depends_on:
+      - shopping.aggregatorapi

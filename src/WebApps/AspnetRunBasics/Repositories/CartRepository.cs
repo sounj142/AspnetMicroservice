@@ -4,10 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AspnetRunBasics.Repositories
 {
@@ -53,11 +50,7 @@ namespace AspnetRunBasics.Repositories
 
             cartItem.Quantity += quantity;
 
-            var jsonData = new StringContent(
-                JsonSerializer.Serialize(cart),
-                Encoding.UTF8,
-                Application.Json);
-            var response = await _client.PutAsync("/Basket", jsonData);
+            var response = await _client.PutAsync("/Basket", cart);
             var c = await response.ReadContentAs<Cart>();
         }
 
@@ -68,11 +61,7 @@ namespace AspnetRunBasics.Repositories
             cart.Items = cart.Items.Where(x => x.ProductId != productId)
                 .ToList();
 
-            var jsonData = new StringContent(
-                JsonSerializer.Serialize(cart),
-                Encoding.UTF8,
-                Application.Json);
-            await _client.PutAsync("/Basket", jsonData);
+            await _client.PutAsync("/Basket", cart);
         }
 
         public async Task ClearCart(string userName)
